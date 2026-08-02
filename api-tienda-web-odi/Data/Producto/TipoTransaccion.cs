@@ -4,6 +4,7 @@
     {
         Trueque = 0,
         Venta = 1,
-        TruequeoVenta = 3,
+        TruequeOVenta = 2,
+        Donar = 3
     }
 }

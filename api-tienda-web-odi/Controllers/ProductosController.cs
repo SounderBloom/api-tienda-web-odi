@@ -20,11 +20,12 @@ namespace api_tienda_web_odi.Controllers
 
         [HttpPost("Crear")]
         [Authorize]
-        public async Task<IActionResult> CrearProducto([FromBody] ProductoDTO producto)
+        public async Task<IActionResult> CrearProducto([FromForm] CrearProductoDTO producto)
         {
             var vendedorId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? Guid.Empty.ToString());
 
             var result = await _productosService.CrearProducto(producto, vendedorId);
+
             if (!result)
             {
                 return BadRequest(new ResponseWrapper<bool>
@@ -74,6 +75,18 @@ namespace api_tienda_web_odi.Controllers
             {
                 Data = true,
                 Message = "Producto eliminado exitosamente",
+                Code = HttpStatusCode.OK
+            });
+        }
+
+        [HttpGet("TiposTransaccion")]
+        public async Task<IActionResult> ObtenerTiposTransaccion()
+        {
+            var tiposTransaccion = _productosService.ObtenerTiposTransaccion();
+            return Ok(new ResponseWrapper<List<TipoTransaccionDTO>>
+            {
+                Data = tiposTransaccion,
+                Message = "Tipos de transacción obtenidos exitosamente",
                 Code = HttpStatusCode.OK
             });
         }

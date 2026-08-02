@@ -3,7 +3,9 @@
     public class FotosProducto
     {
         public int Id { get; set; }
-        public string Foto { get; set; }
-        public List<FotosEnProducto> FotosEnProducto { get; set; } = new();
+        public Guid ProductoId { get; set; }
+        public Producto Producto { get; set; } = new Producto();
+        public string FotoRuta { get; set; } = string.Empty;
+        public int Orden { get; set; }
     }
 }

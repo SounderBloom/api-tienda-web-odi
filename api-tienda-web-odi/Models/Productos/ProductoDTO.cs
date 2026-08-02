@@ -20,5 +20,6 @@ namespace api_tienda_web_odi.Models.Productos
         public Guid VendedorId { get; set; }
         public double Latitud { get; set; }
         public double Longitud { get; set; }
+        public List<IFormFile> Fotos { get; set; } = [];
     }
 }

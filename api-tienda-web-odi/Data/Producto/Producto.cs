@@ -21,7 +21,7 @@ namespace api_tienda_web_odi.Data.Producto
         public double Latitud { get; set; }
         public double Longitud { get; set; }
         public Usuario Vendedor { get; set; }
-        public List<FotosEnProducto> FotosEnProducto { get; set; } = new();
+        public List<FotosProducto> FotosProducto { get; set; } = new();
 
         [InverseProperty("Producto")]
         public List<Chat> Chats { get; set; } = new();

@@ -24,7 +24,6 @@ namespace api_tienda_web_odi.Data
         #endregion
 
         #region Producto
-        public DbSet<FotosEnProducto> FotosEnProducto { get; set; }
         public DbSet<FotosProducto> FotosProducto { get; set; }
         public DbSet<Producto.Producto> Producto { get; set; }
         #endregion

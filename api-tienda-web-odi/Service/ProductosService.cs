@@ -1,4 +1,5 @@
 ﻿using api_tienda_web_odi.Data;
+using api_tienda_web_odi.Data.Producto;
 using api_tienda_web_odi.Infraestructure;
 using api_tienda_web_odi.Models.Productos;
 using Microsoft.EntityFrameworkCore;
@@ -8,17 +9,22 @@ namespace api_tienda_web_odi.Service
     public class ProductosService: IProductosService
     {
         private readonly AppDbContext _context;
-        public ProductosService(AppDbContext context)
+        private readonly IWebHostEnvironment _environment;
+        public ProductosService(
+            AppDbContext context,
+            IWebHostEnvironment environment)
         {
             _context = context;
+            _environment = environment;
         }
 
-        public async Task<bool> CrearProducto(ProductoDTO producto, Guid VendedorId)
+        public async Task<bool> CrearProducto(CrearProductoDTO producto, Guid vendedorId)
         {
-            var trsc = _context.Database.BeginTransaction();
+            await using var trsc = await _context.Database.BeginTransactionAsync();
+
             try
             {
-                _context.Producto.Add(new Data.Producto.Producto
+                var productoBD = _context.Producto.Add(new Producto
                 {
                     Titulo = producto.Titulo,
                     Descripcion = producto.Descripcion,
@@ -28,21 +34,48 @@ namespace api_tienda_web_odi.Service
                     TipoTransaccion = producto.TipoTransaccion,
                     Latitud = producto.Latitud,
                     Longitud = producto.Longitud,
-                    VendedorId = VendedorId
+                    VendedorId = vendedorId
                 });
-                var result = await _context.SaveChangesAsync();
-                if (result <= 0)
+
+                // Guarda primero el producto
+                await _context.SaveChangesAsync();
+
+                foreach (var foto in producto.Fotos)
                 {
-                    await trsc.RollbackAsync();
-                    return false;
+                    string nombreArchivo =
+                        $"{productoBD.Entity.Id}_{foto.Orden}{Path.GetExtension(foto.Foto.FileName)}";
+
+                    string rutaFisica = Path.Combine(
+                        _environment.WebRootPath,
+                        "Uploads",
+                        "Productos",
+                        nombreArchivo);
+
+                    string rutaPublica =
+                        $"/Uploads/Productos/{nombreArchivo}";
+
+                    // Guarda el archivo en disco
+                    await using (FileStream stream = new(rutaFisica, FileMode.Create))
+                    {
+                        await foto.Foto.CopyToAsync(stream);
+                    }
+
+                    _context.FotosProducto.Add(new FotosProducto
+                    {
+                        ProductoId = productoBD.Entity.Id,
+                        Orden = foto.Orden,
+                        FotoRuta = rutaPublica
+                    });
                 }
+
+                await _context.SaveChangesAsync();
                 await trsc.CommitAsync();
+
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 await trsc.RollbackAsync();
-                _ = ex;
                 return false;
             }
         }
@@ -116,5 +149,15 @@ namespace api_tienda_web_odi.Service
                 .ToListAsync();
             return productos;
         }
+
+        public List<TipoTransaccionDTO> ObtenerTiposTransaccion() =>
+            Enum.GetValues<TipoTransaccion>()
+                .Select(t => new TipoTransaccionDTO
+                {
+                    Id = (int)t,
+                    TipoTransaccion = t.ToString().Replace("OVenta", " o Venta")
+                })
+            .ToList();
+
     }
 }
