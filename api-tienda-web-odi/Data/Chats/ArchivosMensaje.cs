@@ -3,7 +3,8 @@
     public class ArchivosMensaje
     {
         public int Id { get; set; }
-        public string Archivo { get; set; } = string.Empty;
-        public List<ArchivosEnMensaje> ArchivosEnMensaje { get; set; } = new();
+        public string NombreArchivo { get; set; } = string.Empty;
+        public int MensajeId { get; set; }
+        public MensajeChat Mensaje { get; set; } = new();
     }
 }

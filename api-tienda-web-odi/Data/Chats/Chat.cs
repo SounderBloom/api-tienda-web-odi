@@ -5,7 +5,7 @@ namespace api_tienda_web_odi.Data.Chats
 {
     public class Chat
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public DateTime FechaCreacion { get; set; } = DateTime.Now;
         public Guid? ProductoId { get; set; }
         public Producto.Producto? Producto { get; set; }

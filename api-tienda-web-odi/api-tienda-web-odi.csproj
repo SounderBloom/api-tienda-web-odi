@@ -27,6 +27,8 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
+    <Folder Include="PrivateUserFiles\ArchivosMensajes\" />
+    <Folder Include="wwwroot\Uploads\Chats\Mensajes\" />
     <Folder Include="wwwroot\Uploads\Productos\" />
   </ItemGroup>
 

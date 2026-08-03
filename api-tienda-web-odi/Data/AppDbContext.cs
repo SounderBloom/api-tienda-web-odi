@@ -20,7 +20,6 @@ namespace api_tienda_web_odi.Data
         public DbSet<Chat> Chat { get; set; }
         public DbSet<MensajeChat> MensajeChat { get; set; }
         public DbSet<ArchivosMensaje> ArchivosMensaje { get; set; }
-        public DbSet<ArchivosEnMensaje> ArchivosEnMensaje { get; set; }
         #endregion
 
         #region Producto

@@ -1,4 +1,5 @@
 ﻿using api_tienda_web_odi.Infraestructure;
+using api_tienda_web_odi.Models.Chats;
 using api_tienda_web_odi.Wrapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -37,6 +38,29 @@ namespace api_tienda_web_odi.Controllers
             {
                 Data = true,
                 Message = "Chat creado exitosamente.",
+                Code = HttpStatusCode.OK
+            });
+        }
+
+        [HttpPost("EnviarMensaje")]
+        [Authorize]
+        public async Task<IActionResult> EnviarMensaje([FromForm] CrearMensajeDTO Mensaje)
+        {
+            var EmisorId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? Guid.Empty.ToString());
+            var enviado = await _chatsService.EnviarMensaje(Mensaje, EmisorId);
+            if (!enviado)
+            {
+                return BadRequest(new ResponseWrapper<bool>
+                {
+                    Data = false,
+                    Message = "No se pudo enviar el mensaje.",
+                    Code = HttpStatusCode.BadRequest
+                });
+            }
+            return Ok(new ResponseWrapper<bool>
+            {
+                Data = true,
+                Message = "Mensaje enviado exitosamente.",
                 Code = HttpStatusCode.OK
             });
         }

@@ -2,8 +2,8 @@
 {
     public enum EmisorMensaje
     {
-        Comprador = 0,
+        Sistema = 0,
         Vendedor = 1,
-        Sistema = 2
+        Comprador = 2
     }
 }
