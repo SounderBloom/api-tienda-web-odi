@@ -7,10 +7,11 @@ namespace api_tienda_web_odi.Data.Auth
     public class Usuario
     {
         public Guid Id { get; set; }
-        public required string Nombre { get; set; }
-        public required string ApellidoPaterno { get; set; }
-        public required string ApellidoMaterno { get; set; }
-        public required string Correo { get; set; }
+        public string Nombre { get; set; }
+        public string ApellidoPaterno { get; set; }
+        public string ApellidoMaterno { get; set; }
+        public string Correo { get; set; }
+        public string Biografia { get; set; } = string.Empty;
         public string FotoPerfilUrl { get; set; } = "/Uploads/Usuarios/default.webp";
         public DateTime FechaRegistro { get; set; }
         public bool Activo { get; set; }

@@ -21,6 +21,7 @@ Para la autenticación de usuarios es utilizado el sistema JWT, que genera un to
 erDiagram
 
     Usuario ||--o{ Producto : publica
+    Categoria ||--o{ Producto : clasifica
     Usuario ||--o{ Chat : inicia
     Producto ||--o{ FotosProducto : contiene
     Producto ||--o{ Chat : genera
@@ -33,12 +34,17 @@ erDiagram
         string ApellidoPaterno
         string ApellidoMaterno
         string Correo
+        string Biografia
         string FotoPerfilUrl
         datetime FechaRegistro
         bool Activo
         bool EmailConfirmado
-        string PasswordHash
         enum Rol
+    }
+
+    Categoria {
+        int Id
+        string Nombre
     }
 
     Producto {
@@ -50,6 +56,7 @@ erDiagram
         datetime FechaPublicacion
         enum TipoTransaccion
         guid VendedorId
+        int CategoriaId
         double Latitud
         double Longitud
     }
@@ -68,8 +75,8 @@ erDiagram
         datetime FechaCreacion
         string NombreProductoSnapshot
         string ImagenProductoSnapshot
-        decimal PrecioProductoSnapshot
         enum TipoTransaccionProductoSnapshot
+        decimal PrecioProductoSnapshot
         bool VisibleParaComprador
         bool VisibleParaVendedor
     }

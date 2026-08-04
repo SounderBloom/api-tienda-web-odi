@@ -18,9 +18,11 @@ namespace api_tienda_web_odi.Data.Producto
         public DateTime FechaPublicacion { get; set; }
         public TipoTransaccion TipoTransaccion { get; set; }
         public Guid VendedorId { get; set; }
+        public Usuario Vendedor { get; set; }
+        public int CategoriaId { get; set; }
+        public Categoria Categoria { get; set; } = new Categoria();
         public double Latitud { get; set; }
         public double Longitud { get; set; }
-        public Usuario Vendedor { get; set; }
         public List<FotosProducto> FotosProducto { get; set; } = new();
 
         [InverseProperty("Producto")]

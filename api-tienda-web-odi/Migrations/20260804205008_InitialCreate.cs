@@ -12,6 +12,19 @@ namespace api_tienda_web_odi.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Categoria",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Categoria", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Usuario",
                 columns: table => new
                 {
@@ -20,6 +33,7 @@ namespace api_tienda_web_odi.Migrations
                     ApellidoPaterno = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ApellidoMaterno = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Correo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Biografia = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FotoPerfilUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FechaRegistro = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Activo = table.Column<bool>(type: "bit", nullable: false),
@@ -30,6 +44,29 @@ namespace api_tienda_web_odi.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Usuario", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Notificaciones",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Titulo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Contenido = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UsuarioNotificadoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FechaCreacion = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UrlImagenIcono = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notificaciones", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Notificaciones_Usuario_UsuarioNotificadoId",
+                        column: x => x.UsuarioNotificadoId,
+                        principalTable: "Usuario",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -44,12 +81,19 @@ namespace api_tienda_web_odi.Migrations
                     FechaPublicacion = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TipoTransaccion = table.Column<int>(type: "int", nullable: false),
                     VendedorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CategoriaId = table.Column<int>(type: "int", nullable: false),
                     Latitud = table.Column<double>(type: "float", nullable: false),
                     Longitud = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Producto", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Producto_Categoria_CategoriaId",
+                        column: x => x.CategoriaId,
+                        principalTable: "Categoria",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Producto_Usuario_VendedorId",
                         column: x => x.VendedorId,
@@ -178,6 +222,16 @@ namespace api_tienda_web_odi.Migrations
                 column: "ChatId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Notificaciones_UsuarioNotificadoId",
+                table: "Notificaciones",
+                column: "UsuarioNotificadoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Producto_CategoriaId",
+                table: "Producto",
+                column: "CategoriaId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Producto_VendedorId",
                 table: "Producto",
                 column: "VendedorId");
@@ -193,6 +247,9 @@ namespace api_tienda_web_odi.Migrations
                 name: "FotosProducto");
 
             migrationBuilder.DropTable(
+                name: "Notificaciones");
+
+            migrationBuilder.DropTable(
                 name: "MensajeChat");
 
             migrationBuilder.DropTable(
@@ -200,6 +257,9 @@ namespace api_tienda_web_odi.Migrations
 
             migrationBuilder.DropTable(
                 name: "Producto");
+
+            migrationBuilder.DropTable(
+                name: "Categoria");
 
             migrationBuilder.DropTable(
                 name: "Usuario");

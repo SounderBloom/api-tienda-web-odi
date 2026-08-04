@@ -28,6 +28,7 @@
   <ItemGroup>
     <Folder Include="Migrations\" />
     <Folder Include="PrivateUserFiles\" />
+    <Folder Include="wwwroot\Icons\" />
     <Folder Include="wwwroot\Uploads\Usuarios\" />
     <Folder Include="wwwroot\Uploads\Productos\" />
   </ItemGroup>

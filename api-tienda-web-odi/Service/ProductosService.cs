@@ -3,6 +3,7 @@ using api_tienda_web_odi.Data.Producto;
 using api_tienda_web_odi.Infraestructure;
 using api_tienda_web_odi.Models.Productos;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace api_tienda_web_odi.Service
 {
@@ -30,6 +31,7 @@ namespace api_tienda_web_odi.Service
                     Descripcion = producto.Descripcion,
                     Precio = producto.Precio,
                     Disponible = true,
+                    CategoriaId = producto.CategoriaId,
                     FechaPublicacion = DateTime.Now,
                     TipoTransaccion = producto.TipoTransaccion,
                     Latitud = producto.Latitud,
@@ -108,27 +110,6 @@ namespace api_tienda_web_odi.Service
             }
         }
 
-        public async Task<List<ProductoDTO>> ObtenerProductos()
-        {
-            var productos = await _context.Producto
-                .Where(p => p.Disponible)
-                .Select(p => new ProductoDTO
-                {
-                    Id = p.Id,
-                    Titulo = p.Titulo,
-                    Descripcion = p.Descripcion,
-                    Precio = p.Precio,
-                    TipoTransaccion = p.TipoTransaccion,
-                    Latitud = p.Latitud,
-                    Longitud = p.Longitud,
-                    VendedorId = p.VendedorId,
-                    FechaPublicacion = p.FechaPublicacion,
-                    Disponible = p.Disponible
-                })
-                .ToListAsync();
-            return productos;
-        }
-
         public async Task<List<ProductoDTO>> ObtenerProductosDeUsuario(Guid UsuarioId)
         {
             var productos = await _context.Producto
@@ -158,6 +139,109 @@ namespace api_tienda_web_odi.Service
                     TipoTransaccion = t.ToString().Replace("OVenta", " o Venta")
                 })
             .ToList();
+
+        public async Task<PaginatedProductosDTO> BuscarProductos(
+            double latitud,
+            double longitud,
+            double radio,
+            int pagina = 1,
+            int cantidadPorPagina = 10,
+            int? categoriaId = null,
+            TipoTransaccion? tipoTransaccion = null)
+        {
+            // Validar que pagina sea mayor a 0
+            if (pagina < 1)
+                pagina = 1;
+
+            if (cantidadPorPagina < 1)
+                cantidadPorPagina = 10;
+
+            // Obtener todos los productos disponibles con filtros básicos
+            var query = _context.Producto
+                .Where(p => p.Disponible)
+                .AsQueryable();
+
+            // Aplicar filtro de categoría si se proporciona
+            if (categoriaId.HasValue)
+            {
+                query = query.Where(p => p.CategoriaId == categoriaId.Value);
+            }
+
+            // Aplicar filtro de tipo de transacción si se proporciona
+            if (tipoTransaccion.HasValue)
+            {
+                query = query.Where(p => p.TipoTransaccion == tipoTransaccion.Value);
+            }
+
+            // Traer a memoria y filtrar por distancia (fórmula de Haversine simplificada)
+            var productosEnMemoria = await query
+                .OrderByDescending(p => p.FechaPublicacion)
+                .ToListAsync();
+
+            // Calcular distancia usando fórmula de Haversine
+            var productosConDistancia = productosEnMemoria
+                .Select(p => new
+                {
+                    Producto = p,
+                    Distancia = CalcularDistancia(latitud, longitud, p.Latitud, p.Longitud)
+                })
+                .Where(x => x.Distancia <= radio)
+                .ToList();
+
+            // Contar total registros
+            int totalRegistros = productosConDistancia.Count;
+            int totalPaginas = (int)Math.Ceiling((double)totalRegistros / cantidadPorPagina);
+
+            // Aplicar paginación
+            var productos = productosConDistancia
+                .Skip((pagina - 1) * cantidadPorPagina)
+                .Take(cantidadPorPagina)
+                .Select(x => new ProductoDTO
+                {
+                    Id = x.Producto.Id,
+                    Titulo = x.Producto.Titulo,
+                    Descripcion = x.Producto.Descripcion,
+                    Precio = x.Producto.Precio,
+                    TipoTransaccion = x.Producto.TipoTransaccion,
+                    Latitud = x.Producto.Latitud,
+                    Longitud = x.Producto.Longitud,
+                    VendedorId = x.Producto.VendedorId,
+                    FechaPublicacion = x.Producto.FechaPublicacion,
+                    Disponible = x.Producto.Disponible
+                })
+                .ToList();
+
+            return new PaginatedProductosDTO
+            {
+                Productos = productos,
+                PaginaActual = pagina,
+                CantidadPorPagina = cantidadPorPagina,
+                TotalRegistros = totalRegistros,
+                TotalPaginas = totalPaginas
+            };
+        }
+
+        /// <summary>
+        /// Calcula la distancia entre dos puntos geográficos usando la fórmula de Haversine
+        /// Retorna la distancia en kilómetros
+        /// </summary>
+        private double CalcularDistancia(double lat1, double lon1, double lat2, double lon2)
+        {
+            const double R = 6371; // Radio de la Tierra en km
+
+            double dLat = (lat2 - lat1) * Math.PI / 180;
+            double dLon = (lon2 - lon1) * Math.PI / 180;
+
+            double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                       Math.Cos(lat1 * Math.PI / 180) * Math.Cos(lat2 * Math.PI / 180) *
+                       Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+
+            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            double distancia = R * c;
+
+            return distancia;
+        }
+
 
     }
 }

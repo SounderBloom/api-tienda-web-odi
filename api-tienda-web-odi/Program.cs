@@ -34,6 +34,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProductosService, ProductosService>();
 builder.Services.AddScoped<IChatsService, ChatsService>();
+builder.Services.AddScoped<ICategoriasService, CategoriasService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

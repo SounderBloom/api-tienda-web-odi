@@ -1,5 +1,6 @@
 ﻿using api_tienda_web_odi.Data.Auth;
 using api_tienda_web_odi.Data.Chats;
+using api_tienda_web_odi.Data.Notificacion;
 using api_tienda_web_odi.Data.Producto;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,6 +26,10 @@ namespace api_tienda_web_odi.Data
         #region Producto
         public DbSet<FotosProducto> FotosProducto { get; set; }
         public DbSet<Producto.Producto> Producto { get; set; }
+        #endregion
+
+        #region Notificaciones
+        public DbSet<Notificaciones> Notificaciones { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

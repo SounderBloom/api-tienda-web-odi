@@ -12,7 +12,7 @@ using api_tienda_web_odi.Data;
 namespace api_tienda_web_odi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260804101224_InitialCreate")]
+    [Migration("20260804205008_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -39,6 +39,10 @@ namespace api_tienda_web_odi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ApellidoPaterno")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Biografia")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -170,6 +174,56 @@ namespace api_tienda_web_odi.Migrations
                     b.ToTable("MensajeChat");
                 });
 
+            modelBuilder.Entity("api_tienda_web_odi.Data.Notificacion.Notificaciones", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Contenido")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UrlImagenIcono")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UsuarioNotificadoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsuarioNotificadoId");
+
+                    b.ToTable("Notificaciones");
+                });
+
+            modelBuilder.Entity("api_tienda_web_odi.Data.Producto.Categoria", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categoria");
+                });
+
             modelBuilder.Entity("api_tienda_web_odi.Data.Producto.FotosProducto", b =>
                 {
                     b.Property<int>("Id")
@@ -200,6 +254,9 @@ namespace api_tienda_web_odi.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("CategoriaId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Descripcion")
                         .IsRequired()
@@ -232,6 +289,8 @@ namespace api_tienda_web_odi.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoriaId");
 
                     b.HasIndex("VendedorId");
 
@@ -277,6 +336,17 @@ namespace api_tienda_web_odi.Migrations
                     b.Navigation("Chat");
                 });
 
+            modelBuilder.Entity("api_tienda_web_odi.Data.Notificacion.Notificaciones", b =>
+                {
+                    b.HasOne("api_tienda_web_odi.Data.Auth.Usuario", "UsuarioNotificado")
+                        .WithMany()
+                        .HasForeignKey("UsuarioNotificadoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UsuarioNotificado");
+                });
+
             modelBuilder.Entity("api_tienda_web_odi.Data.Producto.FotosProducto", b =>
                 {
                     b.HasOne("api_tienda_web_odi.Data.Producto.Producto", "Producto")
@@ -290,11 +360,19 @@ namespace api_tienda_web_odi.Migrations
 
             modelBuilder.Entity("api_tienda_web_odi.Data.Producto.Producto", b =>
                 {
+                    b.HasOne("api_tienda_web_odi.Data.Producto.Categoria", "Categoria")
+                        .WithMany("Productos")
+                        .HasForeignKey("CategoriaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("api_tienda_web_odi.Data.Auth.Usuario", "Vendedor")
                         .WithMany("Productos")
                         .HasForeignKey("VendedorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Categoria");
 
                     b.Navigation("Vendedor");
                 });
@@ -314,6 +392,11 @@ namespace api_tienda_web_odi.Migrations
             modelBuilder.Entity("api_tienda_web_odi.Data.Chats.MensajeChat", b =>
                 {
                     b.Navigation("Archivos");
+                });
+
+            modelBuilder.Entity("api_tienda_web_odi.Data.Producto.Categoria", b =>
+                {
+                    b.Navigation("Productos");
                 });
 
             modelBuilder.Entity("api_tienda_web_odi.Data.Producto.Producto", b =>

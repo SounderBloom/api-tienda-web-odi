@@ -1,6 +1,7 @@
 ﻿using api_tienda_web_odi.Infraestructure;
 using api_tienda_web_odi.Models.Productos;
 using api_tienda_web_odi.Wrapper;
+using api_tienda_web_odi.Data.Producto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -91,17 +92,29 @@ namespace api_tienda_web_odi.Controllers
             });
         }
 
-
-
-        [HttpGet("ObtenerTodo")]
-        [Authorize]
-        public async Task<IActionResult> ObtenerProductos()
+        [HttpGet("Buscar")]
+        public async Task<IActionResult> BuscarProductos(
+            double latitud,
+            double longitud,
+            double radio,
+            int pagina = 1,
+            int cantidadPorPagina = 10,
+            int? categoriaId = null,
+            TipoTransaccion? tipoTransaccion = null)
         {
-            var productos = await _productosService.ObtenerProductos();
-            return Ok(new ResponseWrapper<bool>
+            var resultado = await _productosService.BuscarProductos(
+                latitud,
+                longitud,
+                radio,
+                pagina,
+                cantidadPorPagina,
+                categoriaId,
+                tipoTransaccion);
+
+            return Ok(new ResponseWrapper<PaginatedProductosDTO>
             {
-                Data = true,
-                Message = "Productos obtenidos exitosamente",
+                Data = resultado,
+                Message = "Búsqueda de productos realizada exitosamente.",
                 Code = HttpStatusCode.OK
             });
         }
