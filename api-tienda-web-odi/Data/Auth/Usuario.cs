@@ -11,7 +11,7 @@ namespace api_tienda_web_odi.Data.Auth
         public required string ApellidoPaterno { get; set; }
         public required string ApellidoMaterno { get; set; }
         public required string Correo { get; set; }
-        public string? FotoPerfil { get; set; }
+        public string FotoPerfilUrl { get; set; } = "/Uploads/Usuarios/default.webp";
         public DateTime FechaRegistro { get; set; }
         public bool Activo { get; set; }
         public bool EmailConfirmado { get; set; }

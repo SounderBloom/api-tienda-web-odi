@@ -19,9 +19,23 @@ namespace api_tienda_web_odi.Controllers
             _chatsService = chatsService;
         }
 
-        [HttpPost("Crear")]
+        [HttpGet("ObtenerListaChats")]
         [Authorize]
-        public async Task<IActionResult> CrearChat([FromBody] Guid ProductoId)
+        public async Task<IActionResult> ObtenerChats(int pagina = 0)
+        {
+            var UserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? Guid.Empty.ToString());
+            var chats = await _chatsService.ObtenerChats(UserId, pagina);
+            return Ok(new ResponseWrapper<List<ChatDTO>>
+            {
+                Data = chats,
+                Message = "Chats obtenidos exitosamente.",
+                Code = HttpStatusCode.OK
+            });
+        }
+
+        [HttpPost("Crear/{ProductoId}")]
+        [Authorize]
+        public async Task<IActionResult> CrearChat([FromRoute] Guid ProductoId)
         {
             var UserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? Guid.Empty.ToString());
             var creado = await _chatsService.CrearChat(UserId, ProductoId);
@@ -61,6 +75,29 @@ namespace api_tienda_web_odi.Controllers
             {
                 Data = true,
                 Message = "Mensaje enviado exitosamente.",
+                Code = HttpStatusCode.OK
+            });
+        }
+
+        [HttpDelete("Borrar/{ChatId}")]
+        [Authorize]
+        public async Task<IActionResult> BorrarChat([FromRoute] Guid ChatId)
+        {
+            var UserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? Guid.Empty.ToString());
+            var borrado = await _chatsService.BorrarChat(UserId, ChatId);
+            if (!borrado)
+            {
+                return BadRequest(new ResponseWrapper<bool>
+                {
+                    Data = false,
+                    Message = "No se pudo borrar el chat.",
+                    Code = HttpStatusCode.BadRequest
+                });
+            }
+            return Ok(new ResponseWrapper<bool>
+            {
+                Data = true,
+                Message = "Chat borrado exitosamente.",
                 Code = HttpStatusCode.OK
             });
         }

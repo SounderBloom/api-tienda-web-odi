@@ -1,4 +1,5 @@
 ﻿using api_tienda_web_odi.Data.Auth;
+using api_tienda_web_odi.Data.Producto;
 using Microsoft.EntityFrameworkCore;
 
 namespace api_tienda_web_odi.Data.Chats
@@ -13,6 +14,9 @@ namespace api_tienda_web_odi.Data.Chats
         public Usuario? Comprador { get; set; }
         public string NombreProductoSnapshot { get; set; } = string.Empty;
         public string ImagenProductoSnapshot { get; set; } = string.Empty;
+        public TipoTransaccion TipoTransaccionProductoSnapshot { get; set; }
+        public bool VisibleParaComprador { get; set; } = true;
+        public bool VisibleParaVendedor { get; set; } = true;
 
         [Precision(18, 2)]
         public decimal PrecioProductoSnapshot { get; set; }

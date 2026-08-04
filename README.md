@@ -33,7 +33,7 @@ erDiagram
         string ApellidoPaterno
         string ApellidoMaterno
         string Correo
-        string FotoPerfil
+        string FotoPerfilUrl
         datetime FechaRegistro
         bool Activo
         bool EmailConfirmado
@@ -69,6 +69,9 @@ erDiagram
         string NombreProductoSnapshot
         string ImagenProductoSnapshot
         decimal PrecioProductoSnapshot
+        enum TipoTransaccionProductoSnapshot
+        bool VisibleParaComprador
+        bool VisibleParaVendedor
     }
 
     MensajeChat {
