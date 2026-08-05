@@ -81,7 +81,7 @@ namespace api_tienda_web_odi.Controllers
 
         [HttpPut("Actualizar/{id}")]
         [Authorize(nameof(Rol.Administrador))]
-        public async Task<IActionResult> Actualizar([FromRoute] int id, string nombre)
+        public async Task<IActionResult> Actualizar([FromRoute] int id, [FromBody] string nombre)
         {
             var actualizado = await _categoriasService.ActualizarCategoria(id, nombre);
             if (!actualizado)
